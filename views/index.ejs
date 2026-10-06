@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow &mdash; Modern Task & Note Manager</title>
+    
+    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- TaskFlow Vanilla CSS Design System -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+        <div class="container nav-inner">
+            <div class="nav-brand">
+                <div class="brand-icon">
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                    </svg>
+                </div>
+                <span class="brand-title">TaskFlow</span>
+                <span class="brand-badge">Core v2.0</span>
+            </div>
+
+            <div class="nav-actions">
+                <div class="live-indicator">
+                    <span class="pulse-dot"></span>
+                    <span>Flat-File Engine Active</span>
+                </div>
+                <a href="#taskCreator" class="btn btn-primary btn-sm">
+                    <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    New Task
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="flex: 1;">
+        <!-- Metrics / KPI Row -->
+        <section class="stats-grid">
+            <div class="stat-card" style="--accent-color: #6366f1;">
+                <div class="stat-icon-wrapper">
+                    <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label">Total Tasks</span>
+                    <span class="stat-value"><%= (stats && stats.totalTasks) || (tasks ? tasks.length : 0) %></span>
+                </div>
+            </div>
+
+            <div class="stat-card" style="--accent-color: #06b6d4;">
+                <div class="stat-icon-wrapper">
+                    <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7" />
+                    </svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label">Words Documented</span>
+                    <span class="stat-value"><%= (stats && stats.totalWords) ? stats.totalWords.toLocaleString() : 0 %></span>
+                </div>
+            </div>
+
+            <div class="stat-card" style="--accent-color: #10b981;">
+                <div class="stat-icon-wrapper">
+                    <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2 1.5 3 3.5 3h9c2 0 3.5-1 3.5-3V7c0-2-1.5-3-3.5-3h-9C5.5 4 4 5 4 7zM9 9h6M9 13h4" />
+                    </svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label">Storage Usage</span>
+                    <span class="stat-value"><%= (stats && stats.totalSizeFormatted) || '0 B' %></span>
+                </div>
+            </div>
+
+            <div class="stat-card" style="--accent-color: #a855f7;">
+                <div class="stat-icon-wrapper">
+                    <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+                <div class="stat-info">
+                    <span class="stat-label">Latest Activity</span>
+                    <span class="stat-value" style="font-size: 1.15rem; font-weight: 600;"><%= (stats && stats.latestModifiedRelative) || 'Ready' %></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Task Creator Form Panel -->
+        <section id="taskCreator" class="create-panel">
+            <div class="create-panel-header">
+                <h2 class="panel-title">
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    Create New Task
+                </h2>
+                <div class="panel-hint">
+                    Press <span class="kbd">Ctrl</span> + <span class="kbd">Enter</span> to submit
+                </div>
+            </div>
+
+            <form action="/create" method="POST" id="createTaskForm">
+                <div class="form-group">
+                    <input 
+                        type="text" 
+                        name="title" 
+                        id="taskTitleInput"
+                        class="input-field" 
+                        placeholder="Task title (e.g., API Authentication Workflow)" 
+                        required
+                        autocomplete="off"
+                    >
+                </div>
+
+                <div class="form-group" style="margin-bottom: 0.5rem;">
+                    <!-- Formatting Toolbar -->
+                    <div class="editor-toolbar">
+                        <button type="button" class="tool-btn" title="Bold" onclick="insertFormat('taskDetailsInput', '**', '**')">
+                            <strong>B</strong>
+                        </button>
+                        <button type="button" class="tool-btn" title="Italic" onclick="insertFormat('taskDetailsInput', '*', '*')">
+                            <em>I</em>
+                        </button>
+                        <button type="button" class="tool-btn" title="Code" onclick="insertFormat('taskDetailsInput', '`', '`')">
+                            &lt;/&gt;
+                        </button>
+                        <div class="toolbar-separator"></div>
+                        <button type="button" class="tool-btn" title="Bullet List" onclick="insertFormat('taskDetailsInput', '- ')">
+                            &bull; List
+                        </button>
+                        <button type="button" class="tool-btn" title="Checkbox" onclick="insertFormat('taskDetailsInput', '- [ ] ')">
+                            &#9745; Todo
+                        </button>
+                        <button type="button" class="tool-btn" title="Quote" onclick="insertFormat('taskDetailsInput', '> ')">
+                            &ldquo; Quote
+                        </button>
+                    </div>
+
+                    <textarea 
+                        name="details" 
+                        id="taskDetailsInput" 
+                        class="input-field textarea-field" 
+                        placeholder="Describe your task details, markdown notes, or checklist..."
+                        oninput="updateTextareaStats('taskDetailsInput', 'createWordCount', 'createCharCount')"
+                    ></textarea>
+                </div>
+
+                <div class="editor-footer">
+                    <div class="char-counter">
+                        <span id="createWordCount">0 words</span>
+                        <span>&bull;</span>
+                        <span id="createCharCount">0 chars</span>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="reset" class="btn btn-ghost btn-sm" onclick="setTimeout(() => updateTextareaStats('taskDetailsInput', 'createWordCount', 'createCharCount'), 10)">
+                            Clear
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                            </svg>
+                            Save Task
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <!-- Search, Filter & View Controls -->
+        <section class="controls-bar">
+            <div class="search-box-wrapper">
+                <svg class="search-icon" width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+                <input 
+                    type="text" 
+                    id="taskSearchInput" 
+                    class="search-input" 
+                    placeholder="Search tasks by title or content... (Press / to focus)"
+                    autocomplete="off"
+                >
+                <button type="button" id="searchClearBtn" class="search-clear-btn" title="Clear search">
+                    <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="controls-right">
+                <select id="taskSortSelect" class="select-dropdown">
+                    <option value="modified-desc">Last Modified (Newest)</option>
+                    <option value="modified-asc">Last Modified (Oldest)</option>
+                    <option value="name-asc">Title (A &rarr; Z)</option>
+                    <option value="name-desc">Title (Z &rarr; A)</option>
+                    <option value="size-desc">File Size (Largest)</option>
+                    <option value="size-asc">File Size (Smallest)</option>
+                </select>
+
+                <div class="view-toggle-group">
+                    <button type="button" id="viewGridBtn" class="view-btn active" title="Grid View">
+                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                        </svg>
+                    </button>
+                    <button type="button" id="viewListBtn" class="view-btn" title="List View">
+                        <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+
+                <span id="tasksCountBadge" class="tasks-count-badge">
+                    <%= tasks ? tasks.length : 0 %> tasks
+                </span>
+            </div>
+        </section>
+
+        <!-- Tasks Container (Cards Grid / List) -->
+        <section id="tasksContainer" class="tasks-grid">
+            <% if (tasks && tasks.length > 0) { %>
+                <% tasks.forEach(function(task) { %>
+                    <article 
+                        class="task-card"
+                        data-filename="<%= task.filename %>"
+                        data-title="<%= task.title %>"
+                        data-snippet="<%= task.snippet || '' %>"
+                        data-size="<%= task.size || 0 %>"
+                        data-time="<%= task.modifiedTime || 0 %>"
+                    >
+                        <div class="task-card-body">
+                            <div class="task-badge-row">
+                                <span class="badge badge-file">
+                                    <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    .txt
+                                </span>
+                                <span class="badge badge-size"><%= task.formattedSize %></span>
+                                <% if (task.wordCount) { %>
+                                    <span class="badge badge-size"><%= task.wordCount %> words</span>
+                                <% } %>
+                            </div>
+
+                            <div class="task-card-header">
+                                <h3 class="task-card-title">
+                                    <a href="/file/<%= encodeURIComponent(task.filename) %>"><%= task.title %></a>
+                                </h3>
+
+                                <div class="card-actions-hover">
+                                    <button 
+                                        type="button" 
+                                        class="btn-icon" 
+                                        title="Quick Preview" 
+                                        onclick="QuickPreview.open('<%= task.filename %>')"
+                                    >
+                                        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                    </button>
+
+                                    <a 
+                                        href="/edit/<%= encodeURIComponent(task.filename) %>" 
+                                        class="btn-icon" 
+                                        title="Edit Task & Content"
+                                    >
+                                        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                        </svg>
+                                    </a>
+
+                                    <a 
+                                        href="/download/<%= encodeURIComponent(task.filename) %>" 
+                                        class="btn-icon" 
+                                        title="Download File"
+                                    >
+                                        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                        </svg>
+                                    </a>
+
+                                    <button 
+                                        type="button" 
+                                        class="btn-icon danger" 
+                                        title="Delete Task" 
+                                        onclick="DeleteConfirm.open('<%= task.filename %>')"
+                                    >
+                                        <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <p class="task-card-snippet <%= !task.snippet ? 'empty' : '' %>">
+                                <%= task.snippet || 'No written details provided for this task.' %>
+                            </p>
+                        </div>
+
+                        <div class="task-card-footer">
+                            <span class="task-card-time">
+                                <svg width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <%= task.relativeTime %>
+                            </span>
+
+                            <a href="/file/<%= encodeURIComponent(task.filename) %>" class="read-more-link">
+                                <span>Read More</span>
+                                <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </a>
+                        </div>
+                    </article>
+                <% }) %>
+            <% } else { %>
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m5 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                    </div>
+                    <h3 class="empty-title">No tasks saved yet</h3>
+                    <p class="empty-desc">Create your first task or note using the form above to start organizing your files.</p>
+                    <a href="#taskCreator" class="btn btn-primary btn-sm">Create First Task</a>
+                </div>
+            <% } %>
+        </section>
+    </main>
+
+    <!-- Quick Preview Modal Dialog -->
+    <div id="previewModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modalTaskTitle">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:var(--accent-primary);">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span id="modalTaskTitle">Task Preview</span>
+                </div>
+                <button type="button" class="btn-icon" onclick="QuickPreview.close()" title="Close (Esc)">
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div style="padding: 0.6rem 1.5rem 0 1.5rem;">
+                <div class="content-tabs" style="margin-bottom: 0;">
+                    <button type="button" id="modalTabRendered" class="content-tab-btn active" onclick="QuickPreview.showRendered()">Formatted</button>
+                    <button type="button" id="modalTabRaw" class="content-tab-btn" onclick="QuickPreview.showRaw()">Raw Text</button>
+                </div>
+            </div>
+
+            <div id="modalContentBody" class="modal-body markdown-rendered">
+                <!-- Injected dynamically via JS -->
+            </div>
+
+            <div class="modal-footer">
+                <div style="display:flex; gap:0.5rem;">
+                    <button type="button" class="btn btn-secondary btn-sm" onclick="QuickPreview.copyCurrent()">
+                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                        </svg>
+                        Copy
+                    </button>
+                    <a id="modalEditLink" href="#" class="btn btn-secondary btn-sm">
+                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        </svg>
+                        Edit
+                    </a>
+                </div>
+
+                <div style="display:flex; gap:0.5rem; align-items:center;">
+                    <a id="modalFullLink" href="#" class="read-more-link" style="font-size:0.85rem;">
+                        <span>Full Page View</span>
+                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                    </a>
+                    <button type="button" class="btn btn-ghost btn-sm" onclick="QuickPreview.close()">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Animated Delete Confirmation Modal -->
+    <div id="deleteConfirmModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="modal-box" style="max-width: 440px;">
+            <div class="modal-header">
+                <div class="modal-title" style="color:var(--accent-rose);">
+                    <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    Confirm Permanent Deletion
+                </div>
+                <button type="button" class="btn-icon" onclick="DeleteConfirm.close()">
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="modal-body" style="font-size: 0.9rem; color: var(--text-secondary);">
+                <p>Are you sure you want to permanently delete this task file?</p>
+                <div style="background:var(--bg-base); padding:0.75rem 1rem; border-radius:var(--radius-md); border:1px solid var(--border-subtle); margin-top:0.75rem; font-family:var(--font-mono); color:var(--text-primary); word-break:break-all;">
+                    <span id="deleteModalTargetFile">task.txt</span>
+                </div>
+                <p style="margin-top:0.75rem; font-size:0.8rem; color:var(--text-muted);">
+                    This action will remove the flat-file from disk and cannot be undone.
+                </p>
+            </div>
+
+            <div class="modal-footer" style="justify-content: flex-end; gap: 0.75rem;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="DeleteConfirm.close()">Cancel</button>
+                <form id="deleteModalForm" action="/delete" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">
+                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Delete Task
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Client-side Interactive Engine -->
+    <script src="/js/app.js"></script>
+</body>
+</html>

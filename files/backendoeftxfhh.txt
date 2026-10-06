@@ -1,0 +1,4 @@
+Backend architecture notes:
+- Express server configuration with JSON & urlencoded parser
+- Dynamic file system routes (/create, /file/:filename, /edit)
+- File persistence using Node fs module in ./files directory

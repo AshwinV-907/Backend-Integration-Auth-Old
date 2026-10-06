@@ -1,0 +1,4 @@
+Database schema & flat file storage structure specifications:
+- Storage path: ./files
+- File format: UTF-8 plain text
+- Naming scheme: title.txt (spaces stripped)

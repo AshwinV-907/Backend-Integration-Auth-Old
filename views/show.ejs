@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= filename %> &mdash; TaskFlow</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- TaskFlow Vanilla CSS Design System -->
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <!-- Top Navigation Bar -->
+    <header class="navbar">
+        <div class="container nav-inner">
+            <div class="nav-brand">
+                <a href="/" style="display:flex; align-items:center; gap:0.75rem;">
+                    <div class="brand-icon">
+                        <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                        </svg>
+                    </div>
+                    <span class="brand-title">TaskFlow</span>
+                </a>
+                <span class="brand-badge">Viewer</span>
+            </div>
+
+            <div class="nav-actions">
+                <a href="/" class="btn btn-secondary btn-sm">
+                    <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back to All Tasks
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" style="flex: 1;">
+        <div class="detail-layout">
+            <!-- Breadcrumbs -->
+            <nav class="breadcrumb-nav">
+                <a href="/">Dashboard</a>
+                <span>/</span>
+                <span style="color: var(--text-primary); font-family: var(--font-mono);"><%= filename %></span>
+            </nav>
+
+            <article class="detail-card">
+                <div class="detail-header">
+                    <div class="detail-title-row">
+                        <div>
+                            <div class="task-badge-row" style="margin-bottom:0.75rem;">
+                                <span class="badge badge-file">.txt file</span>
+                                <span class="badge badge-size"><%= (stats && stats.formattedSize) || 'Text' %></span>
+                                <% if (stats && stats.wordCount) { %>
+                                    <span class="badge badge-size"><%= stats.wordCount %> words</span>
+                                <% } %>
+                                <% if (stats && stats.readingTime) { %>
+                                    <span class="badge badge-size"><%= stats.readingTime %></span>
+                                <% } %>
+                            </div>
+                            <h1 class="detail-title"><%= (stats && stats.title) || filename.replace(/\.txt$/, '') %></h1>
+                        </div>
+
+                        <!-- Action Toolbar -->
+                        <div class="detail-toolbar">
+                            <button 
+                                type="button" 
+                                class="btn btn-secondary btn-sm" 
+                                onclick="copyToClipboard(document.getElementById('taskRawData').value, 'Full task copied!')"
+                                title="Copy content"
+                            >
+                                <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                                </svg>
+                                Copy
+                            </button>
+
+                            <a href="/download/<%= encodeURIComponent(filename) %>" class="btn btn-secondary btn-sm" title="Download as .txt">
+                                <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                                Download
+                            </a>
+
+                            <a href="/edit/<%= encodeURIComponent(filename) %>" class="btn btn-primary btn-sm" title="Edit filename and contents">
+                                <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                </svg>
+                                Edit Task
+                            </a>
+
+                            <button 
+                                type="button" 
+                                class="btn btn-danger btn-sm" 
+                                onclick="DeleteConfirm.open('<%= filename %>')"
+                                title="Delete task"
+                            >
+                                <svg width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Meta info row -->
+                    <div class="detail-meta-bar">
+                        <div class="meta-item">
+                            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>Last modified: <strong><%= (stats && stats.formattedDate) || 'Recently' %></strong> (<%= (stats && stats.relativeTime) || 'Now' %>)</span>
+                        </div>
+                        <div class="meta-item">
+                            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                            </svg>
+                            <span>Flat File: <strong class="kbd" style="font-size:0.75rem;"><%= filename %></strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs: Formatted Markdown vs Raw Text -->
+                <div class="content-tabs">
+                    <button type="button" id="tabFormatted" class="content-tab-btn active" onclick="switchViewerTab('formatted')">
+                        Formatted Markdown
+                    </button>
+                    <button type="button" id="tabRaw" class="content-tab-btn" onclick="switchViewerTab('raw')">
+                        Raw Text (<%= (stats && stats.lineCount) || 1 %> lines)
+                    </button>
+                </div>
+
+                <!-- Hidden source text holder -->
+                <textarea id="taskRawData" style="display: none;"><%= filedata %></textarea>
+
+                <!-- Formatted Viewer -->
+                <div id="viewerFormatted" class="content-viewer markdown-rendered">
+                    <!-- Rendered by JS on DOM load -->
+                </div>
+
+                <!-- Raw Plain Text Viewer -->
+                <div id="viewerRaw" class="content-viewer raw-content" style="display: none;">
+                    <%= filedata || '(No details provided for this task)' %>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <!-- Custom Animated Delete Confirmation Modal -->
+    <div id="deleteConfirmModal" class="modal-overlay" role="dialog" aria-modal="true">
+        <div class="modal-box" style="max-width: 440px;">
+            <div class="modal-header">
+                <div class="modal-title" style="color:var(--accent-rose);">
+                    <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    Confirm Permanent Deletion
+                </div>
+                <button type="button" class="btn-icon" onclick="DeleteConfirm.close()">
+                    <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="modal-body" style="font-size: 0.9rem; color: var(--text-secondary);">
+                <p>Are you sure you want to permanently delete this task file?</p>
+                <div style="background:var(--bg-base); padding:0.75rem 1rem; border-radius:var(--radius-md); border:1px solid var(--border-subtle); margin-top:0.75rem; font-family:var(--font-mono); color:var(--text-primary); word-break:break-all;">
+                    <span id="deleteModalTargetFile"><%= filename %></span>
+                </div>
+                <p style="margin-top:0.75rem; font-size:0.8rem; color:var(--text-muted);">
+                    This will delete the file from the ./files directory permanently.
+                </p>
+            </div>
+
+            <div class="modal-footer" style="justify-content: flex-end; gap: 0.75rem;">
+                <button type="button" class="btn btn-secondary btn-sm" onclick="DeleteConfirm.close()">Cancel</button>
+                <form id="deleteModalForm" action="/delete/<%= encodeURIComponent(filename) %>" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">
+                        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        Delete Task
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Client-side Interactive Engine -->
+    <script src="/js/app.js"></script>
+    <script>
+        function switchViewerTab(tab) {
+            const formattedViewer = document.getElementById('viewerFormatted');
+            const rawViewer = document.getElementById('viewerRaw');
+            const tabFormatted = document.getElementById('tabFormatted');
+            const tabRaw = document.getElementById('tabRaw');
+
+            if (tab === 'raw') {
+                formattedViewer.style.display = 'none';
+                rawViewer.style.display = 'block';
+                tabRaw.classList.add('active');
+                tabFormatted.classList.remove('active');
+            } else {
+                formattedViewer.style.display = 'block';
+                rawViewer.style.display = 'none';
+                tabFormatted.classList.add('active');
+                tabRaw.classList.remove('active');
+            }
+        }
+
+        // Render markdown on load
+        document.addEventListener('DOMContentLoaded', () => {
+            const raw = document.getElementById('taskRawData').value;
+            const viewer = document.getElementById('viewerFormatted');
+            if (raw.trim()) {
+                viewer.innerHTML = parseMarkdown(raw);
+            } else {
+                viewer.innerHTML = '<p style="color:var(--text-muted); font-style:italic;">(No written details provided for this task)</p>';
+            }
+        });
+    </script>
+</body>
+</html>

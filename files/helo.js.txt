@@ -1,0 +1,2 @@
+console.log("Hello world from JS script notes!");
+This task details file discusses JavaScript utilities and Express middleware setup.

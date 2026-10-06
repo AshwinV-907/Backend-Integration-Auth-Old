@@ -1,0 +1,4 @@
+Nilotpal frontend deliverables:
+- Dark mode theme implementation matching the design
+- Responsive input and textarea forms with matching placeholders
+- Flex wrap task cards with interactive read more modal / page navigation

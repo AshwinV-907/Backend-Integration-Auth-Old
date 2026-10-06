@@ -1,0 +1,4 @@
+# Chacha Notes
+- Meeting discussion on workshop milestones
+- Overview of fullstack architecture
+- Text file based task storage system
